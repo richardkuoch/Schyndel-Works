@@ -1,0 +1,19 @@
+Links:
+======
+Web-Server-A:	ec2-54-153-248-3.ap-southeast-2.compute.amazonaws.com:8080
+Web-Server-B:	ec2-54-206-2-135.ap-southeast-2.compute.amazonaws.com:8050
+Load-Balancer:	ec2-54-66-168-77.ap-southeast-2.compute.amazonaws.com:80
+
+
+Instance Id:
+============
+Web-Server-A:	i-01752e5e457ce110a
+Web-Server-B:	i-0bf57bc05c6c0bf0b
+Load-Balancer:	i-09a3e191e77aaaaad
+
+
+Instance Type:
+=============
+Web-Server-A:	t2.micro
+Web-Server-B:	t2.large
+Load-Balancer:	t2.xlarge

@@ -1,0 +1,299 @@
+BR (A).1
+
+- Created ec2 t2.micro vm with instance id i-01752e5e457ce110a
+
+- Navigate to Security Groups on EC2 Management Console and add inbound custom TCP rule 8080 for launch-wizard-2 
+
+- Installed Apache 2.4.25 from source using following commands:
+
+  sudo su
+
+  mkdir /etc/apache2
+
+  mkdir /etc/apache2/schyndel
+
+  mkdir /etc/apache2/schyndel/document_root
+
+  mkdir /etc/apache2/schyndel/src
+
+  cd /etc/apache2/schyndel/src
+
+  wget http://apache.mirror.serversaustralia.com.au//httpd/httpd-2.4.25.tar.gz
+
+  wget http://mirror.ventraip.net.au/apache//apr/apr-1.5.2.tar.gz
+
+  wget http://mirror.ventraip.net.au/apache//apr/apr-util-1.5.4.tar.gz
+
+  wget http://au1.php.net/distributions/php-7.1.4.tar.gz 
+
+  tar -xvf httpd-2.4.25.tar.gz
+
+  tar -xvf apr-1.5.2.tar.gz
+
+  tar -xvf apr-util-1.5.4.tar.gz
+
+  tar -xvf php-7.1.4.tar.gz
+
+  mv -f apr-1.5.2 httpd-2.4.25/srclib/apr
+
+  mv -f  apr-util-1.5.4 httpd-2.4.25/srclib/apr-util
+
+  sudo apt-get update
+
+  sudo apt-get install gcc make openssl libssl-dev libxml2 libxml2-dev libpcre3 libpcre3-dev
+
+  cd /etc/apache2/schyndel/src/httpd-2.4.25
+
+  ./configure --prefix=/etc/apache2/schyndel/server_root --with-port=8080 --enable-so --with-included-apr
+
+  make
+
+  make install
+
+  cd /etc/apache2/schyndel/server_root/bin 
+
+  ./apachectl start
+
+  cd /etc/apache2/schyndel/src/httpd-2.4.25
+
+- Configure with prefork MPM since performance is a key concern. If a server process crashes in the prefork MPM then only the request that this process handled is lost.
+
+  ./configure --prefix=/etc/apache2/schyndel/server_root --enable-so --with-mpm=prefork --with-port=8080 --enable-ssl --enable-auth-digest
+
+  make
+
+  make install
+
+  cd /etc/apache2/schyndel/server_root/bin
+
+  ./apachectl start
+  ./apachectl stop
+
+BR (A).1.1
+
+- Navigate to Security Groups on EC2 Management Console and add custom TCP rule 8080
+
+- Configured Apache to be pre-installed with port 8080 as default
+
+- Change Listen directive in httpd.conf to 8080 with following commands:
+  
+  cd /etc/apache2/schyndel/server_root/conf
+
+  vi httpd.conf
+
+- In httpd.conf file change Listen directive to 8080
+  
+  Listen 8080
+
+BR (A).1.2
+
+- Refer to BR(A).1 
+
+- Server installed with following commands:
+
+  ./configure --prefix=/etc/apache2/schyndel/server_root --with-port=8080 --enable-so --with-included-apr
+
+  ./configure --prefix=/etc/apache2/schyndel/server_root --enable-so --with-mpm=prefork --with-port=8080 --enable-ssl --enable-auth-digest
+
+  ls /etc/apache2/schyndel/server_root
+
+BR (A).1.3
+
+- Make directory to store all necessary user key/password/group files for auth
+
+  mkdir /etc/apache2/schnydel/server_root/auth
+
+BR (A).1.4
+
+  cd /etc/apache2/schyndel/src
+
+  wget http://au1.php.net/distributions/php-7.1.4.tar.gz 
+
+  tar -xvf php-7.1.4.tar.gz
+
+  cd /etc/apache2/schyndel/src/php-7.1.4
+
+  ./configure --with-apxs2=/etc/apache2/schyndel/server_root/bin/apxs -- prefix=/etc/apache2/php5
+
+  make
+
+  make install
+  
+  cd /etc/apache2/schyndel/server_root/conf
+  
+  vi httpd.conf
+
+- Add the following lines
+
+  AddType application/x-httpd-php .php
+  AddType application/x-httpd-php-source .phps
+
+BR (A).1.5
+
+- Created business-requirement-a/a-report.txt
+ 
+BR (A).2
+
+  ./configure --prefix=/etc/apache2/schyndel/server_root --enable-speling
+
+  cd /etc/apache2/schyndel/server_root/conf
+
+  vi httpd.conf
+
+- Uncomment # in speling_module
+
+  LoadModule speling_module modules/mod_speling.so
+
+- Add directive for mod_speling
+
+  <IfModule mod_speling.c>
+  CheckSpelling on
+  CheckCaseOnly off
+  </IfModule>
+
+BR (A).3
+
+  mkdir /etc/apache2/schyndel/document_root
+  cd /etc/apache2/schyndel/document_root
+  wget https://github.com/rohit-lakhanpal/schyndel-works-site/archive/master.zip
+  unzip master.zip
+  rm master.zip
+  mv -f schyndel-works-site-master/* .
+  rmdir schyndel-works-site-master/
+
+- Change DocumentRoot directive in httpd.conf to /etc/apache2/schyndel/document_root with following commands:
+
+  cd /etc/apache2/schyndel/server_root/conf
+
+  vi httpd.conf
+
+-In httpd.conf file change DocumentRoot directive with following commands:
+
+
+  DocumentRoot "/etc/apache2/schyndel/document_root"
+  <Directory "/etc/apache2/schyndel/document_root">
+
+- Downloaded the content using the following commands:
+
+  cd /etc/apache2/schyndel/document_root
+
+  wget https://github.com/rohit-lakhanpal/schyndel-works-site/archive/master.zip 
+
+  unzip master.zip
+
+  rm master.zip
+
+  mv -f schyndel-works-site-master/* .
+
+  rmdir schyndel-works-site-master
+
+BR (A).4
+
+- In httpd.conf file change DirectoryIndex directive with following commands:
+
+  <IfModule dir_module>
+      DirectoryIndex index.html index.shtml index.php
+   </IfModule>
+
+BR (A).5
+
+ cd /etc/apache2/schyndel/server_root/conf
+ vi httpd.conf
+
+- Uncomment # for following lines
+ 
+ LoadModule include_module modules/mod_include.so
+  
+ AddType text/html .shtml
+
+ AddHandler server-parsed .shtml
+
+ AddOutputFilter INCLUDES .shtml
+
+- add Includes to the options directive
+ 
+ Options Indexes FollowSymLinks Includes
+
+
+BR (A).6
+
+ <FilesMatch "\.(gif)$">
+ Deny from all
+ </FilesMatch>
+
+BR (A).7
+
+ cd /etc/apache2/schyndel/server_root/auth
+ 
+ ../bin/./htpasswd -c basic.pw bob
+
+- Enter wswt for Bob’s password
+
+ ../bin/./htpasswd basic.pw charlie
+
+- Enter wswt for Charlie’s password
+ 
+ vi basic.pw
+
+- username is stored in plaintext but password is secure
+
+  cd /etc/apache2/schyndel/server_root/conf
+
+  vi httpd.conf
+
+  <Directory "/etc/apache2/schyndel/document_root/ssi/secure-basic">
+        AuthType Basic
+        AuthName "CREDENTIALS PLEASE :)"
+        AuthUserFile /etc/apache2/schyndel/server_root/auth/basic.pw
+        require valid-user
+  </Directory>
+
+BR (A).8
+
+  cd /etc/apache2/schyndel/src/httpd-2.4.25
+
+  ./configure --prefix=/etc/apache2/schyndel/server_root —enable-auth-digest
+
+  cd /etc/apache2/schyndel/server_root/auth
+
+  ../bin/./htdigest -c digest.pw wswt alice
+
+-Enter wswt for Alice’s password
+  
+  ../bin/./htdigest digest.pw wswt dean
+  
+-Enter wswt for Dean’s password
+
+  vi digest.pw
+
+  cd /etc/apache2/schyndel/server_root/conf
+
+  vi httpd.conf
+
+-Uncomment # from line 
+  
+  LoadModule auth_digest_module modules/mod_auth_digest.so
+
+  <Directory "/etc/apache2/schyndel/document_root/secure-digest">
+        AuthType Digest
+        AuthName “wswt”
+        AuthDigestDomain /etc/apache2/schyndel/document_root/secure-digest
+        AuthDigestFile /etc/apache2/schyndel/server_root/auth/digest.pw
+        require valid-user
+  </Directory>
+
+
+BR (A).9
+
+  cd /etc/apache2/schyndel/server_root/conf
+
+  vi httpd.conf
+
+- Add directive for mod_headers.c
+
+  <IfModule mod_headers.c>
+  Header set Response-Header " X-Served-Via: Web-Server-A"
+  </IfModule>
+
+curl -I ec2-54-153-248-3.ap-southeast-2.compute.amazonaws.com:8080
+
